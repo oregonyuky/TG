@@ -1,0 +1,63 @@
+<?xml version="1.0" encoding="UTF-8"?>
+
+<?import javafx.geometry.Insets?>
+<?import javafx.scene.control.Label?>
+<?import javafx.scene.layout.BorderPane?>
+<?import javafx.scene.layout.GridPane?>
+<?import javafx.scene.layout.VBox?>
+<?import javafx.scene.text.Font?>
+
+<?import javafx.scene.layout.HBox?>
+<BorderPane xmlns="http://javafx.com/javafx"
+            xmlns:fx="http://javafx.com/fxml"
+            fx:controller="com.example.tg.controller.MaController"
+            prefWidth="900"
+            prefHeight="600">
+
+    <top>
+        <VBox alignment="CENTER" spacing="10">
+            <padding>
+                <Insets top="30" bottom="20"/>
+            </padding>
+
+            <Label text="Matriz de Adjacência">
+                <font>
+                    <Font size="30"/>
+                </font>
+            </Label>
+
+            <Label text="Representação dos vértices e suas respectivas arestas">
+                <font>
+                    <Font size="15"/>
+                </font>
+            </Label>
+        </VBox>
+    </top>
+
+    <center>
+        <HBox spacing="30" alignment="TOP_CENTER">
+
+            <!-- Matriz -->
+            <GridPane fx:id="gridMatriz"/>
+
+            <!-- Classificação -->
+            <VBox spacing="10">
+                <Label text="Classificação"
+                       style="-fx-font-size: 20px; -fx-font-weight: bold;"/>
+
+                <Label fx:id="labelClassificacao"
+                       wrapText="true"
+                       prefWidth="250"
+                       style="-fx-font-size: 17px;"/>
+
+                <Label fx:id="labelDetalhes"
+                       wrapText="true"
+                       prefWidth="250"
+                       style="-fx-font-size: 17px;"/>
+
+            </VBox>
+
+        </HBox>
+    </center>
+
+</BorderPane>

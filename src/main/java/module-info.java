@@ -4,5 +4,6 @@ module com.example.tg {
 
 
     opens com.example.tg to javafx.fxml;
+    opens com.example.tg.controller to javafx.fxml;
     exports com.example.tg;
 }

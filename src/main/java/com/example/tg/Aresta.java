@@ -42,4 +42,8 @@ public class Aresta {
     public void setPeso(int peso) {
         this.peso = peso;
     }
+
+    public boolean isDirecionado() { return isDirecionado; }
+
+    public void setDirecionado(boolean direcionado) { isDirecionado = direcionado; }
 }

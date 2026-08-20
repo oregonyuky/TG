@@ -1,0 +1,99 @@
+<?xml version="1.0" encoding="UTF-8"?>
+
+<?import javafx.geometry.Insets?>
+<?import javafx.scene.control.Button?>
+<?import javafx.scene.control.Label?>
+<?import javafx.scene.effect.DropShadow?>
+<?import javafx.scene.layout.HBox?>
+<?import javafx.scene.layout.VBox?>
+<?import javafx.scene.text.Font?>
+
+<VBox xmlns="http://javafx.com/javafx"
+      xmlns:fx="http://javafx.com/fxml"
+      fx:controller="com.example.tg.controller.SelecionarController"
+      alignment="CENTER"
+      spacing="50"
+      prefWidth="1000"
+      prefHeight="550">
+
+    <padding>
+        <Insets top="50" right="50" bottom="50" left="50"/>
+    </padding>
+
+    <!-- Título -->
+    <Label text="Qual você deseja escolher?">
+        <font>
+            <Font size="32"/>
+        </font>
+    </Label>
+
+    <!-- Os três botões ficam lado a lado -->
+    <HBox alignment="CENTER" spacing="30">
+
+        <!-- MA -->
+        <Button text="Matriz de Adjacência&#10;(MA)"
+                fx:id="btnMA"
+                onAction="#selecionarMA"
+                prefWidth="260"
+                prefHeight="130"
+                wrapText="true"
+                style="
+                    -fx-font-size: 19px;
+                    -fx-background-radius: 15;
+                    -fx-cursor: hand;
+                    -fx-background-color: #E8E8E8;
+                ">
+
+            <effect>
+                <DropShadow radius="10"
+                            offsetX="4"
+                            offsetY="5"/>
+            </effect>
+
+        </Button>
+
+        <!-- MI -->
+        <Button text="Matriz de Incidência&#10;(MI)"
+                onAction="#selecionarMI"
+                prefWidth="260"
+                prefHeight="130"
+                wrapText="true"
+                style="
+                    -fx-font-size: 19px;
+                    -fx-background-radius: 15;
+                    -fx-cursor: hand;
+                    -fx-background-color: #E8E8E8;
+                ">
+
+            <effect>
+                <DropShadow radius="10"
+                            offsetX="4"
+                            offsetY="5"/>
+            </effect>
+
+        </Button>
+
+        <!-- LA -->
+        <Button text="Lista de Adjacência&#10;(LA)"
+                onAction="#selecionarLA"
+                prefWidth="260"
+                prefHeight="130"
+                wrapText="true"
+                style="
+                    -fx-font-size: 19px;
+                    -fx-background-radius: 15;
+                    -fx-cursor: hand;
+                    -fx-background-color: #E8E8E8;
+                ">
+
+            <effect>
+                <DropShadow radius="10"
+                            offsetX="4"
+                            offsetY="5"/>
+            </effect>
+
+        </Button>
+
+    </HBox>
+
+</VBox>
