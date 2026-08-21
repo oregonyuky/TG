@@ -10,12 +10,15 @@ public class LerArquivo {
 
     private final String arquivo = "/com/example/tg/input.txt";
     private int[][] matriz = new int[11][11];
+    private String[][] matrizLA = new String[11][11];
     private String[] vertices = new String[11];
     private String[][] vMI = new String[11][2];
     private Grafo grafo = new Grafo();
     private int size = 0;
     private int quantidadeArestasMI = 0;
     private String[] pares;
+    private String[] paresLA;
+    private int z=0;
 
     public String[] getPares() {
         return pares;
@@ -132,8 +135,7 @@ public class LerArquivo {
                 }
                 if(origem != null && destino != null){
                     grafo.addAresta( origem, destino, 1, true);
-                    System.out.println("Aresta adicionada: " + origem.getNomeId()
-                            + " -> " + destino.getNomeId());
+                    System.out.println("Aresta adicionada: " + origem.getNomeId() + " -> " + destino.getNomeId());
                 }
             }
             else{
@@ -151,8 +153,7 @@ public class LerArquivo {
                 }
                 if(vertice1 != null && vertice2 != null){
                     grafo.addAresta( vertice1, vertice2, 1, false);
-                    System.out.println("Aresta adicionada: " + vertice1.getNomeId()
-                            + " -- " + vertice2.getNomeId());
+                    System.out.println("Aresta adicionada: " + vertice1.getNomeId() + " -- " + vertice2.getNomeId());
                 }
             }
         }
@@ -160,6 +161,8 @@ public class LerArquivo {
 
     private void processarLA(String linha) {
         String[] partes = linha.split("\\s+");
+        paresLA = linha.split(",|;|\\s");
+        matrizLA[z++] = paresLA;
         String nomeOrigem = partes[0];
         String[] destinoPeso = partes[1].split(",");
         String nomeDestino = destinoPeso[0];
@@ -186,10 +189,16 @@ public class LerArquivo {
             if(v.getNomeId().equals(nome)) return v;
         return null;
     }
-    public String classificarMatriz(){
+    public String classificarMatriz(String modo){
         String s="";
-        if(grafo.isNaoOrientado()){
-            s += (grafo.isNaoOrientado() ? "✅ grafo não orientado\n" : "❌ é orientado\n");
+        if(modo.equals("MA")) {
+            s += (isOrientadoMA() ? "✅ grafo orientado\n" : "❌ não é orientado\n");
+        }
+        if(modo.equals("MI")) {
+            s += (isOrientadoMI() ? "✅ grafo orientado\n" : "❌ não é orientado\n");
+        }
+        if(modo.equals("LA")){
+            s += (grafo.isOrientadoLA() ? "✅ grafo orientado\n" : "❌ não é orientado\n");
         } else {
             if(grafo.isDigrafo())
                 s += (grafo.isDigrafo() ? "✅ dígrafo\n" : "❌ não é dígrafo\n");
@@ -230,9 +239,6 @@ public class LerArquivo {
         }
         return false;
     }
-    public boolean isOrientadoLA(){
-
-    }
     public String getArquivo() {
         return arquivo;
     }
@@ -247,5 +253,13 @@ public class LerArquivo {
 
     public int getSize() {
         return size;
+    }
+
+    public String[] getParesLA() {
+        return paresLA;
+    }
+
+    public String[][] getMatrizLA() {
+        return matrizLA;
     }
 }

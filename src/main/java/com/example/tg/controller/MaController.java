@@ -18,8 +18,9 @@ public class MaController {
 
     public void setModo(String modo){
         la = new LerArquivo();
-        if(modo.equals("MA"))labelTitulo.setText("Matriz de adjacência");
-        else if(modo.equals("MI"))labelTitulo.setText("Matriz de incidência");
+        if(modo.equals("MA"))labelTitulo.setText("Matriz de Adjacência");
+        else if(modo.equals("MI"))labelTitulo.setText("Matriz de Incidência");
+        else labelTitulo.setText("Lista de Adjacencia");
         la.construirMatriz(modo);
         montarMatriz(modo);
     }
@@ -41,22 +42,44 @@ public class MaController {
             c = la.getPares();
             qtdL = la.getSize();
             qtdC = c.length;
-        } else return;
-        int[][] m = la.getMatriz();
-        gridMatriz.getChildren().clear();
-        for (int i = 0; i < qtdL; i++) {
-            Label label = criarCabecalho(c[i]);
-            gridMatriz.add( label, i + 1, 0 );
+        } else {
+            c = la.getParesLA();
+            qtdL = la.getSize();
+            qtdC = c.length;
         }
-        for (int i = 0; i < qtdL; i++) {
-            Label verticeLinha = criarCabecalho(v[i]);
-            gridMatriz.add( verticeLinha, 0, i + 1 );
-            for (int j = 0; j < qtdC; j++) {
-                Label valor = criarCelula( String.valueOf(m[i][j]) );
-                gridMatriz.add( valor, j + 1, i + 1 );
+        if(!modo.equals("LA")) {
+            int[][] m = la.getMatriz();
+            gridMatriz.getChildren().clear();
+            for (int i = 0; i < qtdL; i++) {
+                Label label = criarCabecalho(c[i]);
+                gridMatriz.add(label, i + 1, 0);
+            }
+            for (int i = 0; i < qtdL; i++) {
+                Label verticeLinha = criarCabecalho(v[i]);
+                gridMatriz.add(verticeLinha, 0, i + 1);
+                for (int j = 0; j < qtdC; j++) {
+                    Label valor = criarCelula(String.valueOf(m[i][j]));
+                    gridMatriz.add(valor, j + 1, i + 1);
+                }
+            }
+        } else {
+            String[][] m = la.getMatrizLA();
+            gridMatriz.getChildren().clear();
+            String[] lab = {"origem", "destino", "peso"};
+            for (int i = 0; i < qtdC; i++) {
+                Label label = criarCabecalho(lab[i]);
+                gridMatriz.add(label, i + 1, 0);
+            }
+            for (int i = 0; i < qtdL; i++) {
+                Label verticeLinha = criarCabecalho(v[i]);
+                gridMatriz.add(verticeLinha, 0, i + 1);
+                for (int j = 0; j < qtdC; j++) {
+                    Label valor = criarCelula(m[i][j]);
+                    gridMatriz.add(valor, j + 1, i + 1);
+                }
             }
         }
-        labelClassificacao.setText(la.classificarMatriz());
+        labelClassificacao.setText(la.classificarMatriz(modo));
         labelDetalhes.setText(la.mostrarDetalhes());
     }
 

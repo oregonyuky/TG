@@ -51,6 +51,16 @@ public class SelecionarController {
 
     @FXML
     private void selecionarLA() {
-        System.out.println("Lista de Adjacência selecionada");
+        try {
+            FXMLLoader loader = new FXMLLoader( getClass().getResource("/com/example/tg/ma.fxml") );
+            Parent root = loader.load();
+            MaController c = loader.getController();
+            c.setModo("LA");
+            Stage stage = (Stage) btnMA .getScene() .getWindow();
+            stage.setScene(new Scene(root));
+            stage.show();
+        } catch (IOException e) {
+            e.printStackTrace();
+        }
     }
 }

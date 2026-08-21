@@ -97,17 +97,11 @@ public class Grafo {
         return true;
     }
 
-    public boolean isOrientado(String modo){
-        if(modo.equals("MA")){
-
-        } else if (modo.equals("MI")){
-
-        } else if(modo.equals("LA")) {
-            for (Aresta a : listaA) {
-                if (!existeAresta(a.getDestino(), a.getOrigem())) return true;
-            }
-            return false;
+    public boolean isOrientadoLA(){
+        for (Aresta a : listaA) {
+            if (!existeAresta(a.getDestino(), a.getOrigem())) return true;
         }
+        return false;
     }
     public boolean isGrafoMisto(){
         return !isDigrafo() && !isNaoOrientado();
