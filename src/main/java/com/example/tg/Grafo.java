@@ -6,7 +6,6 @@ import java.util.ArrayList;
 public class Grafo {
     private List<Vertice> listaV;
     private List<Aresta> listaA;
-    private boolean orientado;
 
     public Grafo(List<Vertice> listaV, List<Aresta> listaA) {
         this.listaV = listaV;
@@ -23,15 +22,12 @@ public class Grafo {
     public void addAresta(Vertice origem, Vertice destino, int peso, boolean isDirecionado){
         listaA.add(new Aresta(origem, destino, peso, isDirecionado));
     }
-    public boolean isOrientado(){
-        return orientado;
-    }
     public boolean possuiLaco(){
         for(Aresta a : listaA)
             if(a.getOrigem() == a.getDestino()) return true;
         return false;
     }
-    public boolean possuiArestasParalelas(){
+    public boolean possuiArestasParalelas1(){
         for (int i = 0; i < listaA.size(); i++) {
             for (int j = i + 1; j < listaA.size(); j++) {
                 Aresta a1 = listaA.get(i);
@@ -43,8 +39,22 @@ public class Grafo {
         }
         return false;
     }
+    public boolean possuiArestasParalelas2(){
+        for(Aresta a : listaA){
+            if(contar(a.getOrigem(), a.getDestino()) >= 2)return true;
+        }
+        return false;
+    }
+    public int contar(Vertice a, Vertice b){
+        int c=0;
+        for(Aresta ar : listaA)
+            if(ar.getOrigem().equals(a) && ar.getDestino().equals(b))c++;
+        return c;
+    }
     public boolean isSimples(){
-        return !possuiLaco() && !possuiArestasParalelas();
+        if(possuiLaco())return false;
+        if(isDigrafo())return !possuiArestasParalelas1();
+        else return !possuiArestasParalelas2();
     }
 
     public int grau(Vertice v){
@@ -74,10 +84,19 @@ public class Grafo {
         return true;
     }
 
-    public boolean isDigrafo(){
+    public boolean isDigrafo() {
+        for (Aresta a : listaA)
+            if(existeAresta(a.getDestino(), a.getOrigem()))return false;
+        return true;
+    }
+
+    public boolean isNaoOrientado(){
         for(Aresta a : listaA)
-            if(a.getOrigem() && a.getDestino())
-        return false;
+            if(!existeAresta(a.getDestino(), a.getOrigem()))return false;
+        return true;
+    }
+    public boolean isGrafoMisto(){
+        return !isDigrafo() && !isNaoOrientado();
     }
     public boolean existeAresta(Vertice origem, Vertice destino){
         for(Aresta a : listaA)
