@@ -8,7 +8,7 @@ import java.nio.charset.StandardCharsets;
 
 public class LerArquivo {
 
-    private final String arquivo = "/com/example/tg/entradas/orientados.txt";
+    private final String arquivo = "/com/example/tg/entradas/1-regular.txt";
     private int[][] matriz = new int[11][11];
     private String[][] matrizLA = new String[11][11];
     private String[] vertices = new String[11];

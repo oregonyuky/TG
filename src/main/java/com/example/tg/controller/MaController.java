@@ -60,7 +60,7 @@ public class MaController {
         if(!modo.equals("LA")) {
             int[][] m = la.getMatriz();
             gridMatriz.getChildren().clear();
-            for (int i = 0; i < qtdL; i++) {
+            for (int i = 0; i < qtdC; i++) {
                 Label label = criarCabecalho(c[i]);
                 gridMatriz.add(label, i + 1, 0);
             }
