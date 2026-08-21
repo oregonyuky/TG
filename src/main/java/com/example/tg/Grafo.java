@@ -96,9 +96,23 @@ public class Grafo {
             if(!existeAresta(a.getDestino(), a.getOrigem()))return false;
         return true;
     }
+
+    public boolean isOrientado(String modo){
+        if(modo.equals("MA")){
+
+        } else if (modo.equals("MI")){
+
+        } else if(modo.equals("LA")) {
+            for (Aresta a : listaA) {
+                if (!existeAresta(a.getDestino(), a.getOrigem())) return true;
+            }
+            return false;
+        }
+    }
     public boolean isGrafoMisto(){
         return !isDigrafo() && !isNaoOrientado();
     }
+
     public boolean existeAresta(Vertice origem, Vertice destino){
         for(Aresta a : listaA)
             if(a.getOrigem().equals(origem) && a.getDestino().equals(destino))return true;

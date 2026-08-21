@@ -15,6 +15,11 @@ public class LerArquivo {
     private Grafo grafo = new Grafo();
     private int size = 0;
     private int quantidadeArestasMI = 0;
+    private String[] pares;
+
+    public String[] getPares() {
+        return pares;
+    }
 
     public void construirMatriz(String modo){
         InputStream input = getClass().getResourceAsStream(arquivo);
@@ -48,6 +53,7 @@ public class LerArquivo {
                         break;
 
                     case "LA":
+                        processarLA(linha);
                         break;
                 }
             }
@@ -92,7 +98,7 @@ public class LerArquivo {
             return linhaMatriz;
         }
         if(linha.contains(",")){
-            String[] pares = linha.split("/");
+            pares = linha.split("/");
             for(int i = 0; i < pares.length; i++){
                 String[] partes = pares[i].split(",");
                 String nome1 = partes[0].trim();
@@ -112,45 +118,69 @@ public class LerArquivo {
     }
     private void criarArestaMI(boolean direcionado){
 
-    for(int coluna = 0; coluna < quantidadeArestasMI; coluna++){
-        if(direcionado){
-            Vertice origem = null;
-            Vertice destino = null;
-            for(int linha = 0; linha < size; linha++){
-                if(matriz[linha][coluna] < 0){
-                    origem = buscarVertice(vertices[linha]);
-                }
-                if(matriz[linha][coluna] > 0){
-                    destino = buscarVertice(vertices[linha]);
-                }
-            }
-            if(origem != null && destino != null){
-                grafo.addAresta( origem, destino, 1, true);
-                System.out.println("Aresta adicionada: " + origem.getNomeId()
-                        + " -> " + destino.getNomeId());
-            }
-        }
-        else{
-            Vertice vertice1 = null;
-            Vertice vertice2 = null;
-            for(int linha = 0; linha < size; linha++){
-                if(matriz[linha][coluna] > 0){
-                    if(vertice1 == null){
-                        vertice1 = buscarVertice(vertices[linha]);
+        for(int coluna = 0; coluna < quantidadeArestasMI; coluna++){
+            if(direcionado){
+                Vertice origem = null;
+                Vertice destino = null;
+                for(int linha = 0; linha < size; linha++){
+                    if(matriz[linha][coluna] < 0){
+                        origem = buscarVertice(vertices[linha]);
                     }
-                    else{
-                        vertice2 = buscarVertice(vertices[linha]);
+                    if(matriz[linha][coluna] > 0){
+                        destino = buscarVertice(vertices[linha]);
                     }
                 }
+                if(origem != null && destino != null){
+                    grafo.addAresta( origem, destino, 1, true);
+                    System.out.println("Aresta adicionada: " + origem.getNomeId()
+                            + " -> " + destino.getNomeId());
+                }
             }
-            if(vertice1 != null && vertice2 != null){
-                grafo.addAresta( vertice1, vertice2, 1, false);
-                System.out.println("Aresta adicionada: " + vertice1.getNomeId()
-                        + " -- " + vertice2.getNomeId());
+            else{
+                Vertice vertice1 = null;
+                Vertice vertice2 = null;
+                for(int linha = 0; linha < size; linha++){
+                    if(matriz[linha][coluna] > 0){
+                        if(vertice1 == null){
+                            vertice1 = buscarVertice(vertices[linha]);
+                        }
+                        else{
+                            vertice2 = buscarVertice(vertices[linha]);
+                        }
+                    }
+                }
+                if(vertice1 != null && vertice2 != null){
+                    grafo.addAresta( vertice1, vertice2, 1, false);
+                    System.out.println("Aresta adicionada: " + vertice1.getNomeId()
+                            + " -- " + vertice2.getNomeId());
+                }
             }
         }
     }
-}
+
+    private void processarLA(String linha) {
+        String[] partes = linha.split("\\s+");
+        String nomeOrigem = partes[0];
+        String[] destinoPeso = partes[1].split(",");
+        String nomeDestino = destinoPeso[0];
+        int peso = Integer.parseInt(destinoPeso[1]);
+        Vertice origem = buscarVertice(nomeOrigem);
+        if (origem == null) {
+            grafo.addVertice(nomeOrigem);
+            vertices[size] = nomeOrigem;
+            size++;
+            origem = buscarVertice(nomeOrigem);
+        }
+        Vertice destino = buscarVertice(nomeDestino);
+        if (destino == null) {
+            grafo.addVertice(nomeDestino);
+            vertices[size] = nomeDestino;
+            size++;
+            destino = buscarVertice(nomeDestino);
+        }
+        grafo.addAresta(origem, destino, peso, true);
+    }
+
     private Vertice buscarVertice(String nome){
         for(Vertice v : grafo.getListaV())
             if(v.getNomeId().equals(nome)) return v;
@@ -159,7 +189,7 @@ public class LerArquivo {
     public String classificarMatriz(){
         String s="";
         if(grafo.isNaoOrientado()){
-            s += (grafo.isNaoOrientado() ? "✅ grafo não orientado" : "❌ é orientado\n");
+            s += (grafo.isNaoOrientado() ? "✅ grafo não orientado\n" : "❌ é orientado\n");
         } else {
             if(grafo.isDigrafo())
                 s += (grafo.isDigrafo() ? "✅ dígrafo\n" : "❌ não é dígrafo\n");
@@ -171,7 +201,6 @@ public class LerArquivo {
         s += (grafo.isCompleto() ? "✅ completo" : "❌ não é completo") + "\n";
         s += (grafo.isSimples() ? "✅ simples" : "❌ não é simples") + "\n";
         s += (grafo.isCompletoOrientado() ? "✅ completo e orintado" : "❌ não é completo orientado") + "\n";
-        s += (grafo.isDigrafo() ? "✅ dígrafo" : "❌ não é dígrafo") + "\n";
         return s;
     }
 
@@ -184,7 +213,26 @@ public class LerArquivo {
         }
         return s;
     }
+    public boolean isOrientadoMA(){
+        for(int i=0;i<size;i++){
+            for(int j=size-i-1;j<size;j++){
+                if(matriz[i][j] != matriz[j][i])return true;
+            }
+        }
+        return false;
+    }
 
+    public boolean isOrientadoMI(){
+        for(int i=0;i< pares.length;i++){
+            for(int j=0;j<size;j++){
+                if(matriz[j][i] < 0)return true;
+            }
+        }
+        return false;
+    }
+    public boolean isOrientadoLA(){
+
+    }
     public String getArquivo() {
         return arquivo;
     }

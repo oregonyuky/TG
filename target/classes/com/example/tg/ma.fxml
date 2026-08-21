@@ -20,7 +20,7 @@
                 <Insets top="30" bottom="20"/>
             </padding>
 
-            <Label text="Matriz de Adjacência">
+            <Label fx:id="labelTitulo">
                 <font>
                     <Font size="30"/>
                 </font>

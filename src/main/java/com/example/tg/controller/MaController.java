@@ -7,6 +7,7 @@ import javafx.scene.layout.GridPane;
 
 public class MaController {
 
+    public Label labelTitulo;
     public Label labelClassificacao;
     public Label labelDetalhes;
 
@@ -17,25 +18,40 @@ public class MaController {
 
     public void setModo(String modo){
         la = new LerArquivo();
+        if(modo.equals("MA"))labelTitulo.setText("Matriz de adjacência");
+        else if(modo.equals("MI"))labelTitulo.setText("Matriz de incidência");
         la.construirMatriz(modo);
-        montarMatriz();
+        montarMatriz(modo);
     }
 
 
 
-    private void montarMatriz() {
+    private void montarMatriz(String modo) {
+
         String[] v = la.getVertices();
+        String[] c;
+        int qtdL;
+        int qtdC;
+        if(modo.equals("MA")) {
+            c = v;
+            qtdL = la.getSize();
+            qtdC = la.getSize();
+        }
+        else if(modo.equals("MI")) {
+            c = la.getPares();
+            qtdL = la.getSize();
+            qtdC = c.length;
+        } else return;
         int[][] m = la.getMatriz();
-        int sz = la.getSize();
         gridMatriz.getChildren().clear();
-        for (int i = 0; i < sz; i++) {
-            Label label = criarCabecalho(v[i]);
+        for (int i = 0; i < qtdL; i++) {
+            Label label = criarCabecalho(c[i]);
             gridMatriz.add( label, i + 1, 0 );
         }
-        for (int i = 0; i < sz; i++) {
+        for (int i = 0; i < qtdL; i++) {
             Label verticeLinha = criarCabecalho(v[i]);
             gridMatriz.add( verticeLinha, 0, i + 1 );
-            for (int j = 0; j < sz; j++) {
+            for (int j = 0; j < qtdC; j++) {
                 Label valor = criarCelula( String.valueOf(m[i][j]) );
                 gridMatriz.add( valor, j + 1, i + 1 );
             }
