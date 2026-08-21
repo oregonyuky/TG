@@ -2,14 +2,24 @@ package com.example.tg.controller;
 
 import com.example.tg.LerArquivo;
 import javafx.fxml.FXML;
+import javafx.fxml.FXMLLoader;
+import javafx.scene.Parent;
+import javafx.scene.Scene;
+import javafx.scene.control.Button;
 import javafx.scene.control.Label;
 import javafx.scene.layout.GridPane;
+import javafx.stage.Stage;
+
+import java.io.IOException;
 
 public class MaController {
 
     public Label labelTitulo;
     public Label labelClassificacao;
     public Label labelDetalhes;
+
+    @FXML
+    private Button btnVoltar;
 
     @FXML
     private GridPane gridMatriz;
@@ -107,5 +117,19 @@ public class MaController {
                 "-fx-font-size: 17px;");
 
         return label;
+    }
+
+    @FXML
+    private void voltarParaSelecao() {
+        try {
+            FXMLLoader loader = new FXMLLoader(
+                    getClass().getResource("/com/example/tg/selecionar.fxml"));
+            Parent root = loader.load();
+            Stage stage = (Stage) btnVoltar.getScene().getWindow();
+            stage.setScene(new Scene(root));
+            stage.show();
+        } catch (IOException e) {
+            e.printStackTrace();
+        }
     }
 }
