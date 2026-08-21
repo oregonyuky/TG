@@ -8,7 +8,7 @@ import java.nio.charset.StandardCharsets;
 
 public class LerArquivo {
 
-    private final String arquivo = "/com/example/tg/input.txt";
+    private final String arquivo = "/com/example/tg/entradas/orientados.txt";
     private int[][] matriz = new int[11][11];
     private String[][] matrizLA = new String[11][11];
     private String[] vertices = new String[11];
@@ -52,7 +52,7 @@ public class LerArquivo {
                         linhaMatriz = processarMA(linha, linhaMatriz);
                         break;
                     case "MI":
-                        linhaMatriz = processarMI(linha, linhaMatriz, true);
+                        linhaMatriz = processarMI(linha, linhaMatriz);
                         break;
 
                     case "LA":
@@ -60,9 +60,9 @@ public class LerArquivo {
                         break;
                 }
             }
-            if(modo.equalsIgnoreCase("MI")){
-                criarArestaMI(true);
-            }
+            if(modo.equalsIgnoreCase("MA")) criarArestasMA();
+            if(modo.equalsIgnoreCase("MI")) criarArestasMI();
+            if(modo.equalsIgnoreCase("LA")) criarArestasLA();
         } catch (IOException e) {
             System.out.println("Erro ao ler arquivo: " + e.getMessage());
         }
@@ -81,15 +81,11 @@ public class LerArquivo {
         }
         String[] val = linha.split("\\s+");
         for(int i = 0; i < val.length; i++) {
-            Vertice origem = grafo.getListaV().get(linhaMatriz);
-            Vertice destino = grafo.getListaV().get(i);
-            if(Integer.parseInt(val[i])!=0)
-                grafo.addAresta(origem, destino, Integer.parseInt(val[i]), false);
             matriz[linhaMatriz][i] = Integer.parseInt(val[i]);
         }
         return linhaMatriz+1;
     }
-    private int processarMI(String linha, int linhaMatriz, boolean direcionado){
+    private int processarMI(String linha, int linhaMatriz){
         if(!linha.contains(",") && linha.contains("/")){
             String[] nomeV = linha.split("/");
             for(String nv : nomeV) {
@@ -119,12 +115,26 @@ public class LerArquivo {
         }
         return linhaMatriz + 1;
     }
-    private void criarArestaMI(boolean direcionado){
+    private void criarArestasMA(){
+        boolean direcionado = isOrientadoMA();
+        for(int i = 0; i < size; i++){
+            int inicioColuna = direcionado ? 0 : i;
+            for(int j = inicioColuna; j < size; j++){
+                if(matriz[i][j] != 0){
+                    grafo.addAresta( grafo.getListaV().get(i), grafo.getListaV().get(j), matriz[i][j], direcionado);
+                }
+            }
+        }
+    }
 
+    private void criarArestasMI(){
+        boolean direcionado = isOrientadoMI();
         for(int coluna = 0; coluna < quantidadeArestasMI; coluna++){
+            Vertice origem = null;
+            Vertice destino = null;
+            int peso = 1;
+
             if(direcionado){
-                Vertice origem = null;
-                Vertice destino = null;
                 for(int linha = 0; linha < size; linha++){
                     if(matriz[linha][coluna] < 0){
                         origem = buscarVertice(vertices[linha]);
@@ -132,30 +142,29 @@ public class LerArquivo {
                     if(matriz[linha][coluna] > 0){
                         destino = buscarVertice(vertices[linha]);
                     }
-                }
-                if(origem != null && destino != null){
-                    grafo.addAresta( origem, destino, 1, true);
-                    System.out.println("Aresta adicionada: " + origem.getNomeId() + " -> " + destino.getNomeId());
+                    peso = Math.max(peso, Math.abs(matriz[linha][coluna]));
                 }
             }
             else{
-                Vertice vertice1 = null;
-                Vertice vertice2 = null;
                 for(int linha = 0; linha < size; linha++){
-                    if(matriz[linha][coluna] > 0){
-                        if(vertice1 == null){
-                            vertice1 = buscarVertice(vertices[linha]);
+                    if(matriz[linha][coluna] != 0){
+                        if(origem == null){
+                            origem = buscarVertice(vertices[linha]);
                         }
                         else{
-                            vertice2 = buscarVertice(vertices[linha]);
+                            destino = buscarVertice(vertices[linha]);
                         }
                     }
-                }
-                if(vertice1 != null && vertice2 != null){
-                    grafo.addAresta( vertice1, vertice2, 1, false);
-                    System.out.println("Aresta adicionada: " + vertice1.getNomeId() + " -- " + vertice2.getNomeId());
+                    peso = Math.max(peso, Math.abs(matriz[linha][coluna]));
                 }
             }
+            if((origem == null || destino == null) && vMI[coluna][0] != null){
+                origem = buscarVertice(vMI[coluna][0]);
+                destino = buscarVertice(vMI[coluna][1]);
+            }
+            if(!direcionado && origem != null && destino == null) destino = origem;
+            if(origem != null && destino != null)
+                grafo.addAresta(origem, destino, peso, direcionado);
         }
     }
 
@@ -166,22 +175,55 @@ public class LerArquivo {
         String nomeOrigem = partes[0];
         String[] destinoPeso = partes[1].split(",");
         String nomeDestino = destinoPeso[0];
-        int peso = Integer.parseInt(destinoPeso[1]);
         Vertice origem = buscarVertice(nomeOrigem);
         if (origem == null) {
             grafo.addVertice(nomeOrigem);
             vertices[size] = nomeOrigem;
             size++;
-            origem = buscarVertice(nomeOrigem);
         }
         Vertice destino = buscarVertice(nomeDestino);
         if (destino == null) {
             grafo.addVertice(nomeDestino);
             vertices[size] = nomeDestino;
             size++;
-            destino = buscarVertice(nomeDestino);
         }
-        grafo.addAresta(origem, destino, peso, true);
+    }
+
+    private void criarArestasLA(){
+        boolean direcionado = isOrientadoDadosLA();
+        boolean[] processada = new boolean[z];
+        for(int i = 0; i < z; i++){
+            if(processada[i]) continue;
+            String origemNome = matrizLA[i][0];
+            String destinoNome = matrizLA[i][1];
+            int peso = Integer.parseInt(matrizLA[i][2]);
+            grafo.addAresta(buscarVertice(origemNome), buscarVertice(destinoNome), peso, direcionado);
+            processada[i] = true;
+
+            if(!direcionado && !origemNome.equals(destinoNome)){
+                for(int j = i + 1; j < z; j++){
+                    if (!processada[j] && matrizLA[j][0].equals(destinoNome) && matrizLA[j][1].equals(origemNome)) {
+                        processada[j] = true; break;
+                    }
+                }
+            }
+        }
+    }
+
+    private boolean isOrientadoDadosLA(){
+        for(int i = 0; i < z; i++){
+            String origem = matrizLA[i][0];
+            String destino = matrizLA[i][1];
+            if(origem.equals(destino)) continue;
+            int quantidade = 0;
+            int quantidadeInversa = 0;
+            for(int j = 0; j < z; j++){
+                if(matrizLA[j][0].equals(origem) && matrizLA[j][1].equals(destino)) quantidade++;
+                if(matrizLA[j][0].equals(destino) && matrizLA[j][1].equals(origem)) quantidadeInversa++;
+            }
+            if(quantidade != quantidadeInversa) return true;
+        }
+        return false;
     }
 
     private Vertice buscarVertice(String nome){
@@ -201,15 +243,15 @@ public class LerArquivo {
             s += (grafo.isOrientadoLA() ? "✅ grafo orientado\n" : "❌ não é orientado\n");
         } else {
             if(grafo.isDigrafo())
-                s += (grafo.isDigrafo() ? "✅ dígrafo\n" : "❌ não é dígrafo\n");
+                s += "✅ dígrafo\n";
             else
                 s += (grafo.isGrafoMisto() ? "✅ grafo misto\n" : "❌ não é grafo misto\n");
         }
-        s += (grafo.isRegular() ? "✅ regular" : "❌ não é regular\n");
-        if(grafo.isRegular()) s += "   (" + grafo.grau(grafo.getListaV().get(0)) + " - regular)\n";
-        s += (grafo.isCompleto() ? "✅ completo" : "❌ não é completo") + "\n";
+        int grauRegularidade = grafo.grauRegularidade();
+        s += (grauRegularidade >= 0 ? "✅ regular   (" + grauRegularidade + "-regular)\n" : "❌ não é regular\n");
+        boolean completo = grafo.isDigrafo() ? grafo.isCompletoOrientado() : grafo.isCompleto();
+        s += (completo ? "✅ completo" : "❌ não é completo") + "\n";
         s += (grafo.isSimples() ? "✅ simples" : "❌ não é simples") + "\n";
-        s += (grafo.isCompletoOrientado() ? "✅ completo e orintado" : "❌ não é completo orientado") + "\n";
         return s;
     }
 
@@ -218,13 +260,17 @@ public class LerArquivo {
         s += "Vértices: " + grafo.getListaV().size();
         s += "\nArestas: " + grafo.getListaA().size() + "\n";
         for(Vertice v : grafo.getListaV()){
-            s += v.getNomeId() + " - " + grafo.grau(v) + " grau(s)\n";
+            if(grafo.isDigrafo()){
+                s += v.getNomeId() + " - entrada: " + grafo.grauEntrada(v) + ", saída: " + grafo.grauSaida(v) + "\n";
+            } else {
+                s += v.getNomeId() + " - grau: " + grafo.grau(v) + "\n";
+            }
         }
         return s;
     }
     public boolean isOrientadoMA(){
         for(int i=0;i<size;i++){
-            for(int j=size-i-1;j<size;j++){
+            for(int j=i+1;j<size;j++){
                 if(matriz[i][j] != matriz[j][i])return true;
             }
         }
@@ -232,7 +278,7 @@ public class LerArquivo {
     }
 
     public boolean isOrientadoMI(){
-        for(int i=0;i< pares.length;i++){
+        for(int i=0;i<quantidadeArestasMI;i++){
             for(int j=0;j<size;j++){
                 if(matriz[j][i] < 0)return true;
             }

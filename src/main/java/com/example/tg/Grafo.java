@@ -40,8 +40,16 @@ public class Grafo {
         return false;
     }
     public boolean possuiArestasParalelas2(){
-        for(Aresta a : listaA){
-            if(contar(a.getOrigem(), a.getDestino()) >= 2)return true;
+        for (int i = 0; i < listaA.size(); i++) {
+            for (int j = i + 1; j < listaA.size(); j++) {
+                Aresta a1 = listaA.get(i);
+                Aresta a2 = listaA.get(j);
+                boolean mesmaOrdem = a1.getOrigem().equals(a2.getOrigem())
+                        && a1.getDestino().equals(a2.getDestino());
+                boolean ordemInversa = a1.getOrigem().equals(a2.getDestino())
+                        && a1.getDestino().equals(a2.getOrigem());
+                if(mesmaOrdem || ordemInversa) return true;
+            }
         }
         return false;
     }
@@ -59,16 +67,48 @@ public class Grafo {
 
     public int grau(Vertice v){
         int grau=0;
-        for(Aresta a : listaA)
-            if(a.getOrigem().equals(v) || a.getDestino().equals(v))grau++;
+        for(Aresta a : listaA) {
+            if(a.getOrigem().equals(v)) grau++;
+            if(a.getDestino().equals(v)) grau++;
+        }
         return grau;
     }
+
+    public int grauEntrada(Vertice v){
+        int grau=0;
+        for(Aresta a : listaA)
+            if(a.getDestino().equals(v)) grau++;
+        return grau;
+    }
+
+    public int grauSaida(Vertice v){
+        int grau=0;
+        for(Aresta a : listaA)
+            if(a.getOrigem().equals(v)) grau++;
+        return grau;
+    }
+
     public boolean isRegular(){
-        if (listaV.isEmpty()) return false;
-        int g = grau(listaV.get(0));
+        return grauRegularidade() >= 0;
+    }
+
+    public int grauRegularidade(){
+        if (listaV.isEmpty() || isGrafoMisto()) return -1;
+
+        Vertice primeiro = listaV.get(0);
+        if(isDigrafo()){
+            int grau = grauEntrada(primeiro);
+            if(grauSaida(primeiro) != grau) return -1;
+
+            for(Vertice v : listaV)
+                if(grauEntrada(v) != grau || grauSaida(v) != grau) return -1;
+            return grau;
+        }
+
+        int grau = grau(primeiro);
         for(Vertice v : listaV)
-            if(grau(v)!=g)return false;
-        return true;
+            if(grau(v) != grau) return -1;
+        return grau;
     }
     public boolean isCompleto(){
         for(Vertice v : listaV)
@@ -87,21 +127,18 @@ public class Grafo {
 
     public boolean isDigrafo() {
         for (Aresta a : listaA)
-            if(existeAresta(a.getDestino(), a.getOrigem()))return false;
+            if(!a.isDirecionado()) return false;
         return true;
     }
 
     public boolean isNaoOrientado(){
         for(Aresta a : listaA)
-            if(!existeAresta(a.getDestino(), a.getOrigem()))return false;
+            if(a.isDirecionado()) return false;
         return true;
     }
 
     public boolean isOrientadoLA(){
-        for (Aresta a : listaA) {
-            if (!existeAresta(a.getDestino(), a.getOrigem())) return true;
-        }
-        return false;
+        return isDigrafo();
     }
     public boolean isGrafoMisto(){
         return !isDigrafo() && !isNaoOrientado();
