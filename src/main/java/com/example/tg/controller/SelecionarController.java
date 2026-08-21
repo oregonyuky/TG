@@ -36,7 +36,17 @@ public class SelecionarController {
 
     @FXML
     private void selecionarMI() {
-        System.out.println("Matriz de Incidência selecionada");
+        try {
+            FXMLLoader loader = new FXMLLoader( getClass().getResource("/com/example/tg/ma.fxml") );
+            Parent root = loader.load();
+            MaController c = loader.getController();
+            c.setModo("MI");
+            Stage stage = (Stage) btnMA .getScene() .getWindow();
+            stage.setScene(new Scene(root));
+            stage.show();
+        } catch (IOException e) {
+            e.printStackTrace();
+        }
     }
 
     @FXML

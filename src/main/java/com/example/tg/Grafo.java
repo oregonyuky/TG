@@ -64,6 +64,7 @@ public class Grafo {
         return grau;
     }
     public boolean isRegular(){
+        if (listaV.isEmpty()) return false;
         int g = grau(listaV.get(0));
         for(Vertice v : listaV)
             if(grau(v)!=g)return false;

@@ -5,7 +5,6 @@ import java.io.IOException;
 import java.io.InputStream;
 import java.io.InputStreamReader;
 import java.nio.charset.StandardCharsets;
-import java.util.List;
 
 public class LerArquivo {
 
@@ -15,6 +14,7 @@ public class LerArquivo {
     private String[][] vMI = new String[11][2];
     private Grafo grafo = new Grafo();
     private int size = 0;
+    private int quantidadeArestasMI = 0;
 
     public void construirMatriz(String modo){
         InputStream input = getClass().getResourceAsStream(arquivo);
@@ -44,11 +44,15 @@ public class LerArquivo {
                         linhaMatriz = processarMA(linha, linhaMatriz);
                         break;
                     case "MI":
+                        linhaMatriz = processarMI(linha, linhaMatriz, true);
                         break;
 
                     case "LA":
                         break;
                 }
+            }
+            if(modo.equalsIgnoreCase("MI")){
+                criarArestaMI(true);
             }
         } catch (IOException e) {
             System.out.println("Erro ao ler arquivo: " + e.getMessage());
@@ -89,30 +93,64 @@ public class LerArquivo {
         }
         if(linha.contains(",")){
             String[] pares = linha.split("/");
-            for(String par : pares){
-                String[] partes = par.split(",");
-                String nomeOrigem = partes[0].trim();
-                String nomeDestino = partes[1].trim();
-
-                Vertice origem = buscarVertice(nomeOrigem);
-                Vertice destino = buscarVertice(nomeDestino);
-
-                if(origem == null || destino == null){
-                    System.out.println("Vértice não encontrado: " + nomeOrigem + " ou " + nomeDestino);
-                    continue;
-                }
-
-                grafo.addAresta(origem, destino, 1, direcionado);
-                vMI[linhaMatriz][0] = nomeOrigem;
-                vMI[linhaMatriz][1] = nomeDestino;
-                linhaMatriz++;
+            for(int i = 0; i < pares.length; i++){
+                String[] partes = pares[i].split(",");
+                String nome1 = partes[0].trim();
+                String nome2 = partes[1].trim();
+                vMI[i][0] = nome1;
+                vMI[i][1] = nome2;
             }
             return linhaMatriz;
         }
 
-        return linhaMatriz;
+        String[] valores = linha.split("\\s+");
+        quantidadeArestasMI = valores.length;
+        for (int coluna = 0; coluna < valores.length; coluna++) {
+            matriz[linhaMatriz][coluna] = Integer.parseInt(valores[coluna]);
+        }
+        return linhaMatriz + 1;
     }
+    private void criarArestaMI(boolean direcionado){
 
+    for(int coluna = 0; coluna < quantidadeArestasMI; coluna++){
+        if(direcionado){
+            Vertice origem = null;
+            Vertice destino = null;
+            for(int linha = 0; linha < size; linha++){
+                if(matriz[linha][coluna] < 0){
+                    origem = buscarVertice(vertices[linha]);
+                }
+                if(matriz[linha][coluna] > 0){
+                    destino = buscarVertice(vertices[linha]);
+                }
+            }
+            if(origem != null && destino != null){
+                grafo.addAresta( origem, destino, 1, true);
+                System.out.println("Aresta adicionada: " + origem.getNomeId()
+                        + " -> " + destino.getNomeId());
+            }
+        }
+        else{
+            Vertice vertice1 = null;
+            Vertice vertice2 = null;
+            for(int linha = 0; linha < size; linha++){
+                if(matriz[linha][coluna] > 0){
+                    if(vertice1 == null){
+                        vertice1 = buscarVertice(vertices[linha]);
+                    }
+                    else{
+                        vertice2 = buscarVertice(vertices[linha]);
+                    }
+                }
+            }
+            if(vertice1 != null && vertice2 != null){
+                grafo.addAresta( vertice1, vertice2, 1, false);
+                System.out.println("Aresta adicionada: " + vertice1.getNomeId()
+                        + " -- " + vertice2.getNomeId());
+            }
+        }
+    }
+}
     private Vertice buscarVertice(String nome){
         for(Vertice v : grafo.getListaV())
             if(v.getNomeId().equals(nome)) return v;
